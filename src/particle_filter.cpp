@@ -98,9 +98,19 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
     }
 
 }
-void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
-                                   std::vector<LandmarkObs> observations, Map map_landmarks)
-{
+
+void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
+		const std::vector<LandmarkObs> &observations, const Map &map_landmarks) {
+	// TODO: Update the weights of each particle using a mult-variate Gaussian distribution. You can read
+	//   more about this distribution here: https://en.wikipedia.org/wiki/Multivariate_normal_distribution
+	// NOTE: The observations are given in the VEHICLE'S coordinate system. Your particles are located
+	//   according to the MAP'S coordinate system. You will need to transform between the two systems.
+	//   Keep in mind that this transformation requires both rotation AND translation (but no scaling).
+	//   The following is a good resource for the theory:
+	//   https://www.willamette.edu/~gorr/classes/GeneralGraphics/Transforms/transforms2d.htm
+	//   and the following is a good resource for the actual equation to implement (look at equation 
+	//   3.33
+	//   http://planning.cs.uiuc.edu/node99.html
     for (unsigned int i = 0; i < num_particles; ++i)
     {
         Particle &currentParticle = particles[i];
@@ -151,18 +161,20 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
         weights[i] = weight;
     }
 }
-//void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
-//        const std::vector<LandmarkObs> &observations, const Map &map_landmarks) {
-//    // TODO: Update the weights of each particle using a mult-variate Gaussian distribution. You can read
-//    //   more about this distribution here: https://en.wikipedia.org/wiki/Multivariate_normal_distribution
-//    // NOTE: The observations are given in the VEHICLE'S coordinate system. Your particles are located
-//    //   according to the MAP'S coordinate system. You will need to transform between the two systems.
-//    //   Keep in mind that this transformation requires both rotation AND translation (but no scaling).
-//    //   The following is a good resource for the theory:
-//    //   https://www.willamette.edu/~gorr/classes/GeneralGraphics/Transforms/transforms2d.htm
-//    //   and the following is a good resource for the actual equation to implement (look at equation
-//    //   3.33
-//    //   http://planning.cs.uiuc.edu/node99.html
+
+void ParticleFilter::resample()
+{
+    std::vector<Particle> newParticles;
+    
+    std::discrete_distribution<int> weightsDistribution (weights.begin(), weights.end());
+    
+    for (unsigned int i = 0; i < num_particles; ++i)
+    {
+        newParticles.push_back(particles[weightsDistribution(gen)]);
+    }
+    
+    particles = newParticles;
+    
 //    for(unsigned int i=0;i < num_particles;i++){
 //        std::vector<LandmarkObs> predicted_landmark;
 //        for(unsigned int j = 0; j < map_landmarks.landmark_list.size();j++)
@@ -201,7 +213,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 //        particles[i].weight=weight;
 //        weights[i]= weight;
 //    }
-//}
+}
 
 void ParticleFilter::resample() {
 	// TODO: Resample particles with replacement with probability proportional to their weight. 

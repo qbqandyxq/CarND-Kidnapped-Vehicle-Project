@@ -41,7 +41,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
         init_particle.theta=dist_theta(gen);
         init_particle.weight=1.0;
         particles.push_back(init_particle);
-        weights.push_back(1.0);t
+        weights.push_back(1.0);
     }
     is_initialized=true;
 }
@@ -58,12 +58,12 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
     for (int i = 0; i<num_particles; i++){
 //        Particle &currentParticle = particles[i];
         if(yaw_rate>0.001){
-            dx=velocity/yaw_rate*(sin(particle[i].theta + delta_t* yaw_rate) - sin(particle[i].theta));
-            dy=velocity/yaw_rate*(cos(particle[i].theta)- cos(particle[i].theta + yaw_rate*delta_t));
+            dx=velocity/yaw_rate*(sin(particles[i].theta + delta_t* yaw_rate) - sin(particle[i].theta));
+            dy=velocity/yaw_rate*(cos(particles[i].theta)- cos(particles[i].theta + yaw_rate*delta_t));
             dtheta = yaw_rate * delta_t;
         }else{
-            dx=velocity * cos(particle[i].theta)*delta_t;
-            dy=velocity * sin(particle[i].theta)*delta_t;
+            dx=velocity * cos(particles[i].theta)*delta_t;
+            dy=velocity * sin(particles[i].theta)*delta_t;
             dtheta = 0.0;
         }
         normal_distribution<double> dist_dx(dx, std_pos[0]);
@@ -124,8 +124,8 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
         
         std::vector<LandmarkObs> observationsT = observations;
         for(unsigned int j=0;j<observations.size();j++){
-            observationsT[j].x = particles[i].x + (cos(particles[i].yaw_rate)* observations[j].x - sin(particles[j].yaw_rate)*observations[j].y);
-            observationsT[j].y = particles[i].y + (sin(particles[i].yaw_rate) *observations[j].x+ cos(particles[i].yaw_rate)*observations[j].y);
+            observationsT[j].x = particles[i].x + (cos(particles[i].theta)* observations[j].x - sin(particles[j].theta)*observations[j].y);
+            observationsT[j].y = particles[i].y + (sin(particles[i].theta) *observations[j].x+ cos(particles[i].theta)*observations[j].y);
         }
         dataAssociation(predicted_landmark, observationsT);
         
@@ -139,9 +139,9 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
             double mu_y = map_landmarks.landmark_list[observationsT[j].id].y_f;
             
             //calculate normalization term
-            gauss_norm = (1/(2 * M_PI * sig_x * sig_y));
+            double gauss_norm = (1/(2 * M_PI * sig_x * sig_y));
             //calculate exponent
-            exponent = ((x_obs - mu_x)**2)/(2 * sig_x**2) + ((y_obs-mu_y)**2)/(2*sig_y**2);
+            double exponent = ((x_obs - mu_x)**2)/(2 * (sig_x**2)) + ((y_obs-mu_y)**2)/(2*(sig_y**2));
             //calculate weight using normalization terms and exponent
             weight *= gauss_norm *math.exp(-exponent);
         }

@@ -40,10 +40,10 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
         init_particle.y=dist_y(gen);
         init_particle.theta=dist_theta(gen);
         init_particle.weight=1.0;
-        particles.push_back(currentParticle);
-        weights.push_back(1.0);
+        particles.push_back(init_particle);
+        weights.push_back(1.0);t
     }
-    is_initialized=True;
+    is_initialized=true;
 }
 
 void ParticleFilter::prediction(double delta_t, double std_pos[], double velocity, double yaw_rate) {
@@ -70,9 +70,9 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
         normal_distribution<double> dist_dy(dy, std_pos[1]);
         normal_distribution<double> dist_dtheta(dtheta, std_pos[2]);
         
-        particle[i].x += dist_dx(gen);
-        particle[i].y += dist_dy(gen);
-        particle[i].theta += dist_dtheta(gen);
+        particles[i].x += dist_dx(gen);
+        particles[i].y += dist_dy(gen);
+        particles[i].theta += dist_dtheta(gen);
     }
 
 }
@@ -86,15 +86,14 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
     for(unsigned int i=0;i<observations.size();i++){
         double mindistance = 99999;
         int match_index = 0;
-        for(unsigned int j=0;j<predicted.size();j++{
+        for(unsigned int j=0;j<predicted.size();j++){
             double distance = dist(observations[i].x, observations[i].y, predicted[j].x, predicted[j].y);
             if(distance < mindistance){
                 mindistance=distance;
                 match_index = j;
             }
         }
-            observations[i].id = match_index;
-            
+        observations[i].id = match_index;
     }
 
 }
@@ -111,7 +110,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   and the following is a good resource for the actual equation to implement (look at equation 
 	//   3.33
 	//   http://planning.cs.uiuc.edu/node99.html
-    for(unsigned int i=0;i<num_particles;i++){
+    for(unsigned int i=0;i < num_particles;i++){
         std::vector<LandmarkObs> predicted_landmark;
         for(unsigned int j = 0; j < map_landmarks.landmark_list.size();j++)
         {
@@ -125,8 +124,8 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
         
         std::vector<LandmarkObs> observationsT = observations;
         for(unsigned int j=0;j<observations.size();j++){
-            observationsT[j].x = particle[i].x + (cos(particle[i].yaw_rate)* observations[j].x - sin(particle[j].yaw_rate)*observations[j].y);
-            observationsT[j].y = particle[i].y + (sin(particle[i].yaw_rate) *observations[j].x+ cos(particle[i].yaw_rate)*observations[j].y);
+            observationsT[j].x = particles[i].x + (cos(particles[i].yaw_rate)* observations[j].x - sin(particles[j].yaw_rate)*observations[j].y);
+            observationsT[j].y = particles[i].y + (sin(particles[i].yaw_rate) *observations[j].x+ cos(particles[i].yaw_rate)*observations[j].y);
         }
         dataAssociation(predicted_landmark, observationsT);
         
@@ -146,7 +145,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
             //calculate weight using normalization terms and exponent
             weight *= gauss_norm *math.exp(-exponent);
         }
-        particle[i].weight=weight;
+        particles[i].weight=weight;
         weights[i]= weight;
     }
 }
@@ -186,7 +185,12 @@ Particle ParticleFilter::SetAssociations(Particle& particle, const std::vector<i
     // associations: The landmark id that goes along with each listed association
     // sense_x: the associations x mapping already converted to world coordinates
     // sense_y: the associations y mapping already converted to world coordinates
-
+    
+    //Clear the previous associations
+    particle.associations.clear();
+    particle.sense_x.clear();
+    particle.sense_y.clear();
+    
     particle.associations= associations;
     particle.sense_x = sense_x;
     particle.sense_y = sense_y;

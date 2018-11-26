@@ -58,7 +58,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
     for (int i = 0; i<num_particles; i++){
 //        Particle &currentParticle = particles[i];
         if(yaw_rate>0.001){
-            dx=velocity/yaw_rate*(sin(particles[i].theta + delta_t* yaw_rate) - sin(particle[i].theta));
+            dx=velocity/yaw_rate*(sin(particles[i].theta + delta_t* yaw_rate) - sin(particles[i].theta));
             dy=velocity/yaw_rate*(cos(particles[i].theta)- cos(particles[i].theta + yaw_rate*delta_t));
             dtheta = yaw_rate * delta_t;
         }else{
@@ -141,7 +141,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
             //calculate normalization term
             double gauss_norm = (1/(2 * M_PI * sig_x * sig_y));
             //calculate exponent
-            double exponent = (pow(x_obs - mu_x),2)/(2 *pow(sig_x,2)) + (pow(y_obs-mu_y),2)/(2*pow(sig_y,2));
+            double exponent = (pow(x_obs - mu_x,2))/(2 *pow(sig_x,2)) + (pow(y_obs-mu_y,2))/(2*pow(sig_y,2));
             //calculate weight using normalization terms and exponent
             weight *= gauss_norm *exp(-exponent);
         }

@@ -82,7 +82,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
     double dx = 0;
     double dy = 0;
     double dtheta = 0;
-    
+    default_random_engine gen;
     for (unsigned int i = 0; i != num_particles; ++i)
     {
         Particle &currentParticle = particles[i];

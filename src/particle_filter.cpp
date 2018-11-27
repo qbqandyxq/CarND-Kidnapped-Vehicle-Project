@@ -163,77 +163,12 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     }
 }
 
-void ParticleFilter::resample()
-{
-    std::vector<Particle> newParticles;
-    
-    std::discrete_distribution<int> weightsDistribution (weights.begin(), weights.end());
-    
-    for (unsigned int i = 0; i < num_particles; ++i)
-    {
-        newParticles.push_back(particles[weightsDistribution(gen)]);
-    }
-    
-    particles = newParticles;
-    
-//    for(unsigned int i=0;i < num_particles;i++){
-//        std::vector<LandmarkObs> predicted_landmark;
-//        for(unsigned int j = 0; j < map_landmarks.landmark_list.size();j++)
-//        {
-//            LandmarkObs predictedLandMark;
-//            predictedLandMark.x = map_landmarks.landmark_list[j].x_f;
-//            predictedLandMark.y = map_landmarks.landmark_list[j].y_f;
-//            predictedLandMark.id = map_landmarks.landmark_list[j].id_i;
-//
-//            predicted_landmark.push_back(predictedLandMark);
-//        }
-//
-//        std::vector<LandmarkObs> observationsT = observations;
-//        for(unsigned int j=0;j<observations.size();j++){
-//            observationsT[j].x = particles[i].x + (cos(particles[i].theta)* observations[j].x - sin(particles[j].theta)*observations[j].y);
-//            observationsT[j].y = particles[i].y + (sin(particles[i].theta) *observations[j].x+ cos(particles[i].theta)*observations[j].y);
-//        }
-//        dataAssociation(predicted_landmark, observationsT);
-//
-//        double weight = 1.0;
-//        for(unsigned int j=0;j<observationsT.size();j++){
-//            double sig_x = std_landmark[0];
-//            double sig_y = std_landmark[1];
-//            double x_obs = observationsT[j].x;
-//            double y_obs = observationsT[j].y;
-//            double mu_x = map_landmarks.landmark_list[observationsT[j].id].x_f;
-//            double mu_y = map_landmarks.landmark_list[observationsT[j].id].y_f;
-//
-//            //calculate normalization term
-//            double gauss_norm = (1/(2 * M_PI * sig_x * sig_y));
-//            //calculate exponent
-//            double exponent = (pow(x_obs - mu_x,2))/(2 *pow(sig_x,2)) + (pow(y_obs-mu_y,2))/(2*pow(sig_y,2));
-//            //calculate weight using normalization terms and exponent
-//            weight *= gauss_norm *exp(-exponent);
-//        }
-//        particles[i].weight=weight;
-//        weights[i]= weight;
-//    }
-}
 
 void ParticleFilter::resample() {
 	// TODO: Resample particles with replacement with probability proportional to their weight. 
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
     default_random_engine gen;
-//    index = int(random.random() * num_particles);
-//    beta=0.0;
-//    mw = max(weights);
-//    std::vector<particle> newparticles;
-//    for(unsigned int i=0;i<num_particles;i++){
-//        beta += random.random() *2.0 * mw;
-//        while(beta > weights[index]){
-//            beta -=w[index];
-//            index=(index+1)%N;
-//            newparticles.append(particle[index])
-//        }
-//    }
-//    particle = newparticles;
 
     std::vector<Particle> newParticles;
     std::discrete_distribution<int> weightsDistribution (weights.begin(), weights.end());

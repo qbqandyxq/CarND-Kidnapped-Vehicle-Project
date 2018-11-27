@@ -47,36 +47,69 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
     is_initialized=true;
 }
 
-void ParticleFilter::prediction(double delta_t, double std_pos[], double velocity, double yaw_rate) {
-	// TODO: Add measurements to each particle and add random Gaussian noise.
-	// NOTE: When adding noise you may find std::normal_distribution and std::default_random_engine useful.
-	//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
-	//  http://www.cplusplus.com/reference/random/default_random_engine/
-    double dx=0.0;
-    double dy=0.0;
-    double dtheta=0.0;
-    default_random_engine gen;
-    for (int i = 0; i<num_particles; i++){
-//        Particle &currentParticle = particles[i];
-        if(yaw_rate>0.0001){
-            dx=velocity/yaw_rate*(sin(particles[i].theta + delta_t* yaw_rate) - sin(particles[i].theta));
-            dy=velocity/yaw_rate*(cos(particles[i].theta)- cos(particles[i].theta + yaw_rate*delta_t));
-            dtheta = yaw_rate * delta_t;
-        }else{
-            dx=velocity * cos(particles[i].theta)*delta_t;
-            dy=velocity * sin(particles[i].theta)*delta_t;
-//            dtheta = 0.0;
-        }
-        normal_distribution<double> dist_dx(dx, std_pos[0]);
-        normal_distribution<double> dist_dy(dy, std_pos[1]);
-        normal_distribution<double> dist_dtheta(dtheta, std_pos[2]);
+//void ParticleFilter::prediction(double delta_t, double std_pos[], double velocity, double yaw_rate) {
+//    // TODO: Add measurements to each particle and add random Gaussian noise.
+//    // NOTE: When adding noise you may find std::normal_distribution and std::default_random_engine useful.
+//    //  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
+//    //  http://www.cplusplus.com/reference/random/default_random_engine/
+//    double dx=0.0;
+//    double dy=0.0;
+//    double dtheta=0.0;
+//    default_random_engine gen;
+//    for (int i = 0; i<num_particles; i++){
+////        Particle &currentParticle = particles[i];
+//        if(yaw_rate>0.0001){
+//            dx=velocity/yaw_rate*(sin(particles[i].theta + delta_t* yaw_rate) - sin(particles[i].theta));
+//            dy=velocity/yaw_rate*(cos(particles[i].theta)- cos(particles[i].theta + yaw_rate*delta_t));
+//            dtheta = yaw_rate * delta_t;
+//        }else{
+//            dx=velocity * cos(particles[i].theta)*delta_t;
+//            dy=velocity * sin(particles[i].theta)*delta_t;
+////            dtheta = 0.0;
+//        }
+//        normal_distribution<double> dist_dx(dx, std_pos[0]);
+//        normal_distribution<double> dist_dy(dy, std_pos[1]);
+//        normal_distribution<double> dist_dtheta(dtheta, std_pos[2]);
+//
+//        particles[i].x += dist_dx(gen);
+//        particles[i].y += dist_dy(gen);
+//        particles[i].theta += dist_dtheta(gen);
+//    }
+//
+//}
+void ParticleFilter::prediction(double delta_t, double std_pos[], double velocity, double yaw_rate)
+{
+    double dx = 0;
+    double dy = 0;
+    double dtheta = 0;
+    
+    for (unsigned int i = 0; i != num_particles; ++i)
+    {
+        Particle &currentParticle = particles[i];
         
-        particles[i].x += dist_dx(gen);
-        particles[i].y += dist_dy(gen);
-        particles[i].theta += dist_dtheta(gen);
+        if (fabs(yaw_rate) > 0.0001)
+        {
+            dx = velocity/yaw_rate*(sin(currentParticle.theta+yaw_rate*delta_t)-sin(currentParticle.theta));
+            dy = velocity/yaw_rate*(cos(currentParticle.theta)-cos(currentParticle.theta+yaw_rate*delta_t));
+            dtheta = yaw_rate*delta_t;
+        }
+        else
+        {
+            dx = velocity*cos(currentParticle.theta)*delta_t;
+            dy = velocity*sin(currentParticle.theta)*delta_t;
+            dtheta = 0;
+        }
+        
+        normal_distribution<double> dist_x(dx, std_pos[0]);
+        normal_distribution<double> dist_y(dy, std_pos[1]);
+        normal_distribution<double> dist_theta(dtheta, std_pos[2]);
+        
+        currentParticle.x += dist_x(gen);
+        currentParticle.y += dist_y(gen);
+        currentParticle.theta += dist_theta(gen);
     }
-
 }
+
 
 void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::vector<LandmarkObs>& observations) {
 	// TODO: Find the predicted measurement that is closest to each observed measurement and assign the 

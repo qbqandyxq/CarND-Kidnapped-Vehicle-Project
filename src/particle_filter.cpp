@@ -111,6 +111,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   and the following is a good resource for the actual equation to implement (look at equation 
 	//   3.33
 	//   http://planning.cs.uiuc.edu/node99.html
+    default_random_engine gen;
     for (unsigned int i = 0; i < num_particles; ++i)
     {
         Particle &currentParticle = particles[i];
